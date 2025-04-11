@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { Button } from "~/components/ui/button";
 import { Home, Tv2, Film, Radio, Clock, History } from "lucide-react"
 import {
     Sidebar,
@@ -11,7 +10,6 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarTrigger,
 } from "./ui/sidebar"
 
 // Menu items for navigation

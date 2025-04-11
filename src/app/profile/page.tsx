@@ -2,12 +2,13 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "/components/ui/tabs"
-import { MovieCard } from "/components/movie-card"
-import { Button } from "/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "/components/ui/avatar"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
+import  MovieCard  from "~/components/movie-card"
+import { Button } from "~/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Edit, Settings } from "lucide-react"
 import { Star } from "lucide-react"
+import { RatingStars } from "~/components/rating-stars"
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("favorites")
@@ -26,18 +27,21 @@ export default function ProfilePage() {
           title: "The Batman",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.5,
+          description: "When a sadistic serial killer begins murdering key political figures in Gotham, Batman is forced to investigate the city's hidden corruption and question his family's involvement.",
         },
         {
           id: "3",
           title: "Top Gun: Maverick",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.3,
+          description: "After more than thirty years of service as one of the Navy's top aviators, Pete Mitchell is where he belongs, pushing the envelope as a courageous test pilot.",
         },
         {
           id: "5",
           title: "Oppenheimer",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.7,
+          description: "The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb.",
         },
       ],
       watchlist: [
@@ -46,12 +50,14 @@ export default function ProfilePage() {
           title: "Poor Things",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.6,
+          description: "The incredible tale about the fantastical evolution of Bella Baxter, a young woman brought back to life by the brilliant and unorthodox scientist Dr. Godwin Baxter.",
         },
         {
           id: "8",
           title: "Past Lives",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.5,
+          description: "Nora and Hae Sung, two deeply connected childhood friends, are wrested apart after Nora's family emigrates from South Korea. Twenty years later, they are reunited for one fateful week.",
         },
       ],
       watched: [
@@ -60,24 +66,28 @@ export default function ProfilePage() {
           title: "Everything Everywhere All at Once",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.8,
+          description: "A middle-aged Chinese immigrant is swept up in an insane adventure, where she alone can save the world by exploring other universes connecting with the lives she could have led.",
         },
         {
           id: "4",
           title: "The Banshees of Inisherin",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.1,
+          description: "Two lifelong friends find themselves at an impasse when one abruptly ends their relationship, with alarming consequences for both of them.",
         },
         {
           id: "7",
           title: "Killers of the Flower Moon",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.4,
+          description: "When oil is discovered in 1920s Oklahoma under Osage Nation land, the Osage people are murdered one by one - until the FBI steps in to unravel the mystery.",
         },
         {
           id: "9",
           title: "Barbie",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.2,
+          description: "Barbie suffers a crisis that leads her to question her world and her existence.",
         },
       ],
       reviews: [
@@ -157,10 +167,10 @@ export default function ProfilePage() {
               {user.libraries.favorites.map((movie) => (
                 <MovieCard
                   key={movie.id}
-                  id={movie.id}
                   title={movie.title}
-                  posterUrl={movie.posterUrl}
+                  image={movie.posterUrl}
                   rating={movie.rating}
+                  description={movie.description}
                 />
               ))}
             </div>
@@ -179,10 +189,10 @@ export default function ProfilePage() {
               {user.libraries.watchlist.map((movie) => (
                 <MovieCard
                   key={movie.id}
-                  id={movie.id}
                   title={movie.title}
-                  posterUrl={movie.posterUrl}
+                  image={movie.posterUrl}
                   rating={movie.rating}
+                  description={movie.description}
                 />
               ))}
             </div>
@@ -201,10 +211,10 @@ export default function ProfilePage() {
               {user.libraries.watched.map((movie) => (
                 <MovieCard
                   key={movie.id}
-                  id={movie.id}
                   title={movie.title}
-                  posterUrl={movie.posterUrl}
+                  image={movie.posterUrl}
                   rating={movie.rating}
+                  description={movie.description}
                 />
               ))}
             </div>
@@ -232,8 +242,7 @@ export default function ProfilePage() {
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold mb-1">{review.title}</h3>
                     <div className="flex items-center gap-1 mb-2">
-                      <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />
-                      <span>{review.rating}/5</span>
+                      <RatingStars movieId={review.id} initialRating={review.rating} />
                     </div>
                     <p className="text-muted-foreground">{review.review}</p>
                   </div>

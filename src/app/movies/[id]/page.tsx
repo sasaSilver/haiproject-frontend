@@ -1,11 +1,11 @@
 import Image from "next/image"
 import { Clock, Calendar, Star, Heart, Bookmark, Share2 } from "lucide-react"
 
-import { Button } from "/components/ui/button"
-import { Badge } from "/components/ui/badge"
-import { RatingStars } from "/components/rating-stars"
-import { Separator } from "/components/ui/separator"
-import { MovieCard } from "/components/movie-card"
+import { Button } from "~/components/ui/button"
+import { Badge } from "~/components/ui/badge"
+import { RatingStars } from "~/components/rating-stars"
+import { Separator } from "~/components/ui/separator"
+import MovieCard from "~/components/movie-card"
 
 // This would normally come from a database
 const getMovieDetails = (id: string) => {
@@ -27,24 +27,28 @@ const getMovieDetails = (id: string) => {
         title: "Blade Runner 2049",
         posterUrl: "/placeholder.svg?height=450&width=300",
         rating: 4.5,
+        description: "A young blade runner's discovery of a long-buried secret leads him to track down former blade runner Rick Deckard, who's been missing for thirty years.",
       },
       {
         id: "20",
         title: "Arrival",
         posterUrl: "/placeholder.svg?height=450&width=300",
         rating: 4.6,
+        description: "A linguist works with the military to communicate with alien lifeforms after twelve mysterious spacecraft appear around the world.",
       },
       {
         id: "21",
         title: "Interstellar",
         posterUrl: "/placeholder.svg?height=450&width=300",
         rating: 4.8,
+        description: "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",
       },
       {
         id: "22",
         title: "The Martian",
         posterUrl: "/placeholder.svg?height=450&width=300",
         rating: 4.4,
+        description: "An astronaut becomes stranded on Mars after his team assume him dead, and must rely on his ingenuity to find a way to signal to Earth that he is alive.",
       },
     ],
   }
@@ -151,10 +155,10 @@ export default function MoviePage({ params }: { params: { id: string } }) {
             {movie.similar.map((similarMovie) => (
               <MovieCard
                 key={similarMovie.id}
-                id={similarMovie.id}
                 title={similarMovie.title}
-                posterUrl={similarMovie.posterUrl}
+                image={similarMovie.posterUrl}
                 rating={similarMovie.rating}
+                description={similarMovie.description}
               />
             ))}
           </div>

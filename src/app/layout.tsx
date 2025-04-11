@@ -18,7 +18,7 @@ const geist = Geist({
   variable: "--font-geist-sans",
 });
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -35,12 +35,10 @@ export default async function RootLayout({
           <SidebarProvider>
             <Sidebar/>
             <Header/>
-            <main
-              className="mt-16"
-              >
+            <main className="mt-16">
               {children}
             </main>
-              </SidebarProvider>
+          </SidebarProvider>
         </ThemeProvider>
       </body>
     </html>
