@@ -1,18 +1,52 @@
-import { Button } from "~/components/ui/button";
-import { Bell } from "lucide-react";
-import ThemeToggle from "~/components/theme-toggle";
-import Link from "next/link";
+"use client"
 
-export default function() {
-    return (
-      <div className="flex gap-4">
-        <ThemeToggle/>
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-          <Bell className="h-5 w-5" />
-        </Button>
-        <Button asChild variant="secondary" className="text-muted-foreground hover:text-foreground">
-          <Link href="/auth/login">Sign In</Link>
-        </Button>
-      </div>
-    );
+import { Button } from "~/components/ui/button"
+import ThemeToggle from "~/components/theme-toggle"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+} from "~/components/ui/dropdown-menu"
+import AuthForm from "./AuthForm"
+
+import { useLoginState } from "~/store/login";
+import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
+
+export default function UserCenter() {
+  const { isLoggedIn, username } = useLoginState();
+  const router = useRouter();
+  const { theme } = useTheme();
+
+  const handleUserButtonClick = () => {
+    if (isLoggedIn) {
+      router.push("/profile");
+    }
+  };
+
+  return (
+    <div className="flex gap-4 items-center">
+      <ThemeToggle />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="secondary"
+            className="text-muted-foreground hover:text-foreground"
+            onClick={handleUserButtonClick}
+          >
+            {isLoggedIn ? username : "Sign In"}
+          </Button>
+        </DropdownMenuTrigger>
+        {!isLoggedIn && (
+          <DropdownMenuContent
+            className={`w-[320px] p-4 backdrop-blur-sm ${
+              theme === "dark" ? "bg-black/10" : "bg-white/10"
+            }`}
+          >
+            <AuthForm />
+          </DropdownMenuContent>
+        )}
+      </DropdownMenu>
+    </div>
+  )
 }

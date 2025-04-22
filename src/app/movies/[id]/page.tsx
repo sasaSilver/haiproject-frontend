@@ -7,7 +7,6 @@ import { RatingStars } from "~/components/rating-stars"
 import { Separator } from "~/components/ui/separator"
 import MovieCard from "~/components/movie-card"
 
-// This would normally come from a database
 const getMovieDetails = (id: string) => {
   return {
     id,
@@ -158,7 +157,6 @@ export default function MoviePage({ params }: { params: { id: string } }) {
                 title={similarMovie.title}
                 image={similarMovie.posterUrl}
                 rating={similarMovie.rating}
-                description={similarMovie.description}
               />
             ))}
           </div>

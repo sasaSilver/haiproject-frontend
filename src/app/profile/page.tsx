@@ -1,25 +1,31 @@
-"use client"
+"use client";
 
 import { useState } from "react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 import  MovieCard  from "~/components/movie-card"
 import { Button } from "~/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import { Edit, Settings } from "lucide-react"
-import { Star } from "lucide-react"
+import { Edit } from "lucide-react"
 import { RatingStars } from "~/components/rating-stars"
+import { useLoginState } from "~/store/login"
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("favorites")
+  const router = useRouter()
+  const logout = useLoginState((state) => state.logout)
+  const { isLoggedIn, username } = useLoginState();
 
-  // Mock user data
+  if (!isLoggedIn || !username) {
+    useLoginState.getState().openSignInDropdown();
+    router.push("/");
+    return null;
+  }
+  
   const user = {
-    name: "Jane Smith",
-    username: "janesmith",
+    name: username,
     avatar: "/placeholder.svg?height=100&width=100",
-    joinDate: "January 2023",
-    reviewCount: 42,
     libraries: {
       favorites: [
         {
@@ -27,21 +33,18 @@ export default function ProfilePage() {
           title: "The Batman",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.5,
-          description: "When a sadistic serial killer begins murdering key political figures in Gotham, Batman is forced to investigate the city's hidden corruption and question his family's involvement.",
         },
         {
           id: "3",
           title: "Top Gun: Maverick",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.3,
-          description: "After more than thirty years of service as one of the Navy's top aviators, Pete Mitchell is where he belongs, pushing the envelope as a courageous test pilot.",
         },
         {
           id: "5",
           title: "Oppenheimer",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.7,
-          description: "The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb.",
         },
       ],
       watchlist: [
@@ -50,14 +53,12 @@ export default function ProfilePage() {
           title: "Poor Things",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.6,
-          description: "The incredible tale about the fantastical evolution of Bella Baxter, a young woman brought back to life by the brilliant and unorthodox scientist Dr. Godwin Baxter.",
         },
         {
           id: "8",
           title: "Past Lives",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.5,
-          description: "Nora and Hae Sung, two deeply connected childhood friends, are wrested apart after Nora's family emigrates from South Korea. Twenty years later, they are reunited for one fateful week.",
         },
       ],
       watched: [
@@ -66,28 +67,24 @@ export default function ProfilePage() {
           title: "Everything Everywhere All at Once",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.8,
-          description: "A middle-aged Chinese immigrant is swept up in an insane adventure, where she alone can save the world by exploring other universes connecting with the lives she could have led.",
         },
         {
           id: "4",
           title: "The Banshees of Inisherin",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.1,
-          description: "Two lifelong friends find themselves at an impasse when one abruptly ends their relationship, with alarming consequences for both of them.",
         },
         {
           id: "7",
           title: "Killers of the Flower Moon",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.4,
-          description: "When oil is discovered in 1920s Oklahoma under Osage Nation land, the Osage people are murdered one by one - until the FBI steps in to unravel the mystery.",
         },
         {
           id: "9",
           title: "Barbie",
           posterUrl: "/placeholder.svg?height=450&width=300",
           rating: 4.2,
-          description: "Barbie suffers a crisis that leads her to question her world and her existence.",
         },
       ],
       reviews: [
@@ -121,43 +118,32 @@ export default function ProfilePage() {
           </Avatar>
           <div className="text-center md:text-left">
             <h1 className="text-2xl font-bold">{user.name}</h1>
-            <p className="text-muted-foreground mb-2">{user.username}</p>
-            <p className="text-sm text-muted-foreground mb-4">Member since {user.joinDate}</p>
-            <div className="flex gap-2">
+            <div className="flex gap-2 pt-4">
               <Button variant="outline" size="sm">
                 <Edit className="w-4 h-4 mr-2" />
                 Edit Profile
               </Button>
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  logout()
+                  router.push("/")
+                }}
+              >
+                Logout
               </Button>
             </div>
           </div>
         </div>
-
-        <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-8 md:place-items-end">
-          <div className="text-center p-4 rounded-lg border">
-            <div className="text-3xl font-bold">{user.libraries.favorites.length}</div>
-            <div className="text-sm text-muted-foreground">Favorites</div>
-          </div>
-          <div className="text-center p-4 rounded-lg border">
-            <div className="text-3xl font-bold">{user.libraries.watched.length}</div>
-            <div className="text-sm text-muted-foreground">Watched</div>
-          </div>
-          <div className="text-center p-4 rounded-lg border">
-            <div className="text-3xl font-bold">{user.reviewCount}</div>
-            <div className="text-sm text-muted-foreground">Reviews</div>
-          </div>
-        </div>
       </div>
 
-      <Tabs defaultValue="favorites" onValueChange={setActiveTab}>
+      <Tabs defaultValue="reviews" onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-4 mb-8">
-          <TabsTrigger value="favorites">Favorites</TabsTrigger>
-          <TabsTrigger value="watchlist">Watch Later</TabsTrigger>
-          <TabsTrigger value="watched">Watched</TabsTrigger>
-          <TabsTrigger value="reviews">Reviews</TabsTrigger>
+          <TabsTrigger value="favorites">Favorites ({user.libraries.favorites.length})</TabsTrigger>
+          <TabsTrigger value="watchlist">Watch Later ({user.libraries.watchlist.length})</TabsTrigger>
+          <TabsTrigger value="watched">Watched ({user.libraries.watched.length})</TabsTrigger>
+          <TabsTrigger value="reviews">Reviews ({user.libraries.reviews.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="favorites">
@@ -170,7 +156,10 @@ export default function ProfilePage() {
                   title={movie.title}
                   image={movie.posterUrl}
                   rating={movie.rating}
-                  description={movie.description}
+                  year={2000}
+                  description="asd"
+                  genres={[]}
+                  duration={2000}
                 />
               ))}
             </div>
@@ -188,12 +177,15 @@ export default function ProfilePage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {user.libraries.watchlist.map((movie) => (
                 <MovieCard
-                  key={movie.id}
-                  title={movie.title}
-                  image={movie.posterUrl}
-                  rating={movie.rating}
-                  description={movie.description}
-                />
+                key={movie.id}
+                title={movie.title}
+                image={movie.posterUrl}
+                rating={movie.rating}
+                year={2000}
+                description="asd"
+                genres={[]}
+                duration={2000}
+              />
               ))}
             </div>
           ) : (
@@ -210,12 +202,15 @@ export default function ProfilePage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {user.libraries.watched.map((movie) => (
                 <MovieCard
-                  key={movie.id}
-                  title={movie.title}
-                  image={movie.posterUrl}
-                  rating={movie.rating}
-                  description={movie.description}
-                />
+                key={movie.id}
+                title={movie.title}
+                image={movie.posterUrl}
+                rating={movie.rating}
+                year={2000}
+                description="asd"
+                genres={[]}
+                duration={2000}
+              />
               ))}
             </div>
           ) : (
