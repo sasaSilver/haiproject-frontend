@@ -1,36 +1,55 @@
-import Image from "next/image";
-import type { Movie } from "~/lib/api/types"
-import {
-  Card,
-  CardDescription,
-  CardTitle,
-  CardContent,
-} from "~/components/ui/card";
+import Link from "next/link";
+import { Card } from "~/components/ui/card";
+import { GenreBadges } from "./genre-bagdes";
+import type { Movie } from "~/lib/api/types";
+import { fetchPoster } from "~/lib/utils";
 
+type MovieCardProps = {
+  movie: Movie;
+};
 
-export default function MovieCard(movie: Movie) {
+export async function MovieCard({ movie }: MovieCardProps) {
+  const poster_path = await fetchPoster(movie.id);
   return (
-    <Card className="w-[350px] relative overflow-hidden">
-      <CardContent className="p-0">
-        <div className="relative w-full h-[400px]">
-          <Image 
-            src={movie.image} 
-            alt={movie.title} 
-            fill 
-            style={{ objectFit: "cover" }} 
-            className="hover:scale-105 transition-transform duration-300"
-          />
-          <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-4 flex flex-col justify-end text-white">
-            <CardTitle className="text-2xl font-bold mb-1">{movie.title}</CardTitle>
-            <CardDescription className="text-gray-300 mb-2">
-              {movie.year}
-            </CardDescription>
-            <p className="text-sm text-gray-200 line-clamp-2">
+    <Link href={`/movies/${movie.id}`} className="group">
+      <Card className="relative w-[300px] h-[450px] rounded-2xl overflow-hidden shadow-lg cursor-pointer">
+        <div 
+          className="absolute inset-0 bg-cover bg-center transition-all duration-500 
+                     group-hover:scale-105 
+                     group-hover:bg-black/20 group-hover:dark:bg-white/20"
+          style={{ backgroundImage: `url(${poster_path})` }}
+        />
+        
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent 
+                        to-black/60 dark:to-white/60
+                        group-hover:to-black/80 group-hover:dark:to-white/80
+                        transition-all duration-500" />
+
+        <div className="absolute inset-0 z-20 flex flex-col justify-end p-4 overflow-hidden">
+          <div className="transform transition-all duration-500 ease-in-out translate-y-[calc(100%-110px)] group-hover:translate-y-0">
+            <div className="pb-4">
+              <h2 className="text-2xl font-bold text-white dark:text-gray-900 leading-tight">
+                {movie.title}
+              </h2>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-white dark:text-gray-800 text-sm font-medium">
+                  IMDb: {movie.vote_average}/10
+                </span>
+                {movie.user_rating !== undefined && (
+                  <span className="text-xs text-gray-900 bg-yellow-400 px-2 py-0.5 rounded-full">
+                    You rated: {movie.user_rating}/10
+                  </span>
+                )}
+              </div>
+              <GenreBadges genres={movie.genres} />
+            </div>
+            
+            <p className="text-sm text-white dark:text-gray-800 mt-5">
               {movie.description}
             </p>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </Card>
+    </Link>
   );
 }

@@ -6,14 +6,18 @@ import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
 const config = {
-    images: {
-        remotePatterns: [
-          {
-            protocol: "https",
-            hostname: "**",
-          },
-        ],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
+ },
 };
 
 export default config;

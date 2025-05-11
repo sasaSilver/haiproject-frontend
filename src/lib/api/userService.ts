@@ -1,17 +1,20 @@
 import { ApiClient } from "./apiClient";
-import type { User, UserUpdate } from "./types";
+import type { CurrentUser, CurrentUserUpdate } from "./types";
 
-export const userService = {
+export const UserService = {
     async getUser(userId: number) {
-        return ApiClient.get<User>(`/users/${userId}`);
+        return ApiClient.get<CurrentUser>(`/users/${userId}`);
     },
-    async updateUser(user: UserUpdate) {
-        return ApiClient.patch<User>(`/users/${user.id}`, user);
+    async updateUser(user: CurrentUserUpdate) {
+        return ApiClient.patch<CurrentUser>(`/users/${user.id}`, user);
     },
     async deleteUser(userId: number) {
         return ApiClient.delete(`/users/${userId}`);
     },
     async getCurrentUser() {
-        return ApiClient.get<User>('/users/me')
+        return ApiClient.get<CurrentUser>('/users/me')
+    },
+    async updateCurrentUserName(name: string) {
+        return ApiClient.patch<CurrentUser>('/users/me', name);
     }
 }

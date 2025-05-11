@@ -1,23 +1,45 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 type LoginState = {
   isLoggedIn: boolean,
+  setLoggedIn: (value: boolean) => void;
   username: string | null,
-  reviewedMovies: string[],
-  signInDropdownOpen: boolean,
-  login: (username: string) => void,
-  logout: () => void,
-  openSignInDropdown: () => void,
-  closeSignInDropdown: () => void,
+  setUserName: (name: string | null) => void;
 }
 
-export const useLoginState = create<LoginState>((set) => ({
-  isLoggedIn: false,
-  username: null,
-  reviewedMovies: [],
-  signInDropdownOpen: false,
-  login: (username: string) => set({ isLoggedIn: true, username, signInDropdownOpen: false }),
-  logout: () => set({ isLoggedIn: false, username: null }),
-  openSignInDropdown: () => set({ signInDropdownOpen: true }),
-  closeSignInDropdown: () => set({ signInDropdownOpen: false }),
-}));
+const localStoragePersist = {
+  getItem: (name: string) => {
+    try {
+      const item = localStorage.getItem(name);
+      return item ? JSON.parse(item) : null;
+    } catch {
+      return null;
+    }
+  },
+  setItem: (name: string, value: any) => {
+    try {
+      localStorage.setItem(name, JSON.stringify(value));
+    } catch { console.log(`Failed to set ${name} to ${value} in local storage` )}
+  },
+  removeItem: (name: string) => {
+    try {
+      localStorage.removeItem(name);
+    } catch { console.log(`Failed to remove ${name} from local storage` )}
+  },
+};
+
+export const useLoginState = create<LoginState>()(
+  persist(
+    (set) => ({
+      isLoggedIn: false,
+      setLoggedIn: (value: boolean) => set({ isLoggedIn: value }),
+      username: null,
+      setUserName: (name: string | null) => set({ username: name }),
+    }),
+    {
+      name: 'login-storage',
+      storage: localStoragePersist,
+    }
+  )
+);

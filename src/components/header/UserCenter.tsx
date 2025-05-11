@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Button } from "~/components/ui/button"
 import ThemeToggle from "~/components/theme-toggle"
@@ -17,13 +17,6 @@ export default function UserCenter() {
   const { isLoggedIn, username } = useLoginState();
   const router = useRouter();
   const { theme } = useTheme();
-
-  const handleUserButtonClick = () => {
-    if (isLoggedIn) {
-      router.push("/profile");
-    }
-  };
-
   return (
     <div className="flex gap-4 items-center">
       <ThemeToggle />
@@ -31,8 +24,9 @@ export default function UserCenter() {
         <DropdownMenuTrigger asChild>
           <Button
             variant="secondary"
-            className="text-muted-foreground hover:text-foreground"
-            onClick={handleUserButtonClick}
+            onClick={()=>{
+                isLoggedIn && router.push("/profile");
+            }}
           >
             {isLoggedIn ? username : "Sign In"}
           </Button>

@@ -10,28 +10,39 @@ export type Rating = {
 }
 
 export type Genre = {
-    id: number,
+    id: string,
     name: string
 }
 
 export type Movie = {
-    id?: number,
+    id?: string,
+    user_rating?: number,
+    vote_average: number,
     title: string,
-    duration: number,
+    popularity: number,
     genres: Genre[],
     year: number,
-    rating: number,
+    vote_count: number,
     description: string,
-    image: string
 }
 
 export type MovieUpdate = Partial<Movie>;
 
 export type User = {
     id: number,
+    name: string
+}
+
+export type CurrentUserRating = {
+    movie: Movie,
+    rating: number
+}
+
+export type CurrentUser = {
+    id: number,
     name: string,
     recommendations: Movie[],
-    ratings: Rating[]
+    ratings: CurrentUserRating[]
 }
 
 export type UserCreate = {
@@ -39,18 +50,4 @@ export type UserCreate = {
     password: string
 }
 
-export type UserUpdate = Partial<User>;
-
-export type MovieFilters = {
-    andGenres?: string[],
-    notGenres?: string[],
-    orGenres?: string[],
-    year?: number,
-    rating?: number,
-    limit?: number
-}
-
-export type Oauth2PasswordRequestForm = {
-    username: string,
-    password: string
-}
+export type CurrentUserUpdate = Partial<CurrentUser>;

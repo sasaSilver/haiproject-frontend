@@ -1,77 +1,103 @@
-import { AuthService }from './authService';
+import Cookies from 'js-cookie';
+import { AuthService } from './authService';
 import { env } from '~/env';
+import { useLoginState } from '~/store/login';
 
-const API_BASE_URL = env.NEXT_PUBLIC_API_BASE_URL
+const API_BASE_URL = env.NEXT_PUBLIC_API_BASE_URL;
 
-interface ApiClientConfig {
+class ApiError extends Error {
+  constructor(
+    public message: string,
+    public status: number,
+    public details?: unknown
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+type ApiClientConfig = {
   baseUrl?: string;
   getToken?: () => string | null;
-  onUnauthorized?: () => void;
-}
+  onUnauthorized?: () => Promise<void>;
+};
 
 export const createApiClient = (config: ApiClientConfig = {}) => {
   const baseUrl = config.baseUrl || API_BASE_URL;
-  
-  const request = async (endpoint: string, options: RequestInit = {}) => {
+
+  async function request<T>(
+    endpoint: string,
+    options: RequestInit = {},
+  ): Promise<T> {
     const url = `${baseUrl}${endpoint}`;
     const headers = new Headers(options.headers || {});
-    
+
     const token = config.getToken?.();
     if (token) {
       headers.append('Authorization', `Bearer ${token}`);
     }
-    
-    if (!(options.body instanceof FormData)) {
-      headers.append('Content-Type', 'application/json');
+
+    headers.append('Content-Type', 'application/json');
+
+    const response = await fetch(url, {
+      ...options,
+      headers,
+      credentials: 'include',
+    });
+
+    if (response.status === 401) {
+      await config.onUnauthorized?.();
+      console.log("unauthorized")
+      throw new ApiError('Session expired', 401);
     }
 
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers,
-        credentials: 'include'
-      });
-
-      if (response.status === 401) {
-        config.onUnauthorized?.();
-        throw new Error('Session expired');
-      }
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.message || 'Request failed');
-      }
-
-      return response.json();
-    } catch (error) {
-      console.error('API request failed:', error);
-      throw error;
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new ApiError(
+        error.message || 'Request failed',
+        response.status,
+        error.details
+      );
     }
-  };
+
+    const data = await response.json();
+
+    return data;
+  }
 
   return {
-    get: <T>(endpoint: string) => request(endpoint) as Promise<T>,
-    post: <T>(endpoint: string, body: any, headers?: any) => 
-      request(endpoint, { method: 'POST', body: JSON.stringify(body) }) as Promise<T>,
-    patch: <T>(endpoint: string, body: any) => 
-      request(endpoint, { method: 'PATCH', body: JSON.stringify(body) }) as Promise<T>,
-    delete: <T>(endpoint: string) => 
-      request(endpoint, { method: 'DELETE' }) as Promise<T>,
-    upload: <T>(endpoint: string, formData: FormData) =>
-      request(endpoint, { method: 'POST', body: formData }) as Promise<T>
+    get: <T>(endpoint: string) => request<T>(endpoint, { method: 'GET' }),
+    post: <T>(endpoint: string, body: unknown) =>
+      request<T>(endpoint, { method: 'POST', body: JSON.stringify(body) }),
+    patch: <T>(endpoint: string, body: unknown) =>
+      request<T>(endpoint, { method: 'PATCH', body: JSON.stringify(body) }),
+    delete: <T>(endpoint: string) =>
+      request<T>(endpoint, { method: 'DELETE' }),
   };
 };
 
-let authToken: string | null = null;
+export function setAuthToken(token: string | null) {
+  if (token) {
+    Cookies.set('authToken', token, {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      expires: 1,
+    });
+  } else {
+    Cookies.remove('authToken');
+  }
+}
 
-export const setAuthToken = (token: string | null) => {
-  authToken = token;
-};
+export function getAuthToken(): string | null {
+  return Cookies.get('authToken') || null;
+}
 
 export const ApiClient = createApiClient({
-  getToken: () => authToken,
-  onUnauthorized: () => {
-    AuthService.logout();
-    window.location.href = '/login';
-  }
+  getToken: getAuthToken,
+  onUnauthorized: async () => {
+    await AuthService.logout();
+    const { setLoggedIn, setUserName } = useLoginState.getState();
+    setLoggedIn(false);
+    setUserName(null);
+  },
 });
