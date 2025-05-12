@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Home, Tv2, Film, Clock, History } from "lucide-react"
+import { Home, Tv2, Film, Clock, History, User } from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
@@ -13,30 +13,15 @@ import {
 
 const navigationItems = [
     {
-      title: "Popular",
-      url: "/popular",
+      title: "Home",
+      url: "/",
       icon: Home,
     },
     {
-      title: "TV Shows",
-      url: "/tv-shows",
-      icon: Tv2,
-    },
-    {
-      title: "Movies",
-      url: "/movies",
-      icon: Film,
-    },
-    {
-      title: "Watch Later",
-      url: "/watch-later",
-      icon: Clock,
-    },
-    {
-      title: "History",
-      url: "/history",
-      icon: History,
-    },
+      title: "Profile",
+      url: "/profile",
+      icon: User,
+    }
 ]
 
 export default function MovieSidebar(props: {className?: string}) {

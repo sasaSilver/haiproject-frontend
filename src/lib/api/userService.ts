@@ -12,7 +12,7 @@ export const UserService = {
         return ApiClient.delete(`/users/${userId}`);
     },
     async getCurrentUser() {
-        return ApiClient.get<CurrentUser>('/users/me')
+        return await ApiClient.get<CurrentUser>('/users/me');
     },
     async updateCurrentUserName(name: string) {
         return ApiClient.patch<CurrentUser>('/users/me', name);

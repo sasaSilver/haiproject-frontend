@@ -5,7 +5,7 @@ export type Token = {
 
 export type Rating = {
     user_id: number,
-    movie_id: number,
+    movie_id: string,
     rating: number
 }
 
@@ -41,7 +41,6 @@ export type CurrentUserRating = {
 export type CurrentUser = {
     id: number,
     name: string,
-    recommendations: Movie[],
     ratings: CurrentUserRating[]
 }
 

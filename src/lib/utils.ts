@@ -7,14 +7,18 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export async function fetchPoster(id?: string) {
-  if (!id) return null;
-  let response = null;
-  try {
-    response = await fetch(`http://www.omdbapi.com/?i=tt${id}&apikey=${env.OMDB_KEY}`)
-  } catch {
+  if (!id) {
     return null;
   }
-  if (!response) return null;
+  let response = null;
+  try {
+    response = await fetch(`http://www.omdbapi.com/?i=tt${id}&apikey=${env.NEXT_PUBLIC_OMDB_KEY}`)
+  } catch (e) {
+    return null;
+  }
+  if (!response) {
+    return null;
+  }
   const json = await response.json()
   const poster_path = json.Poster
   return poster_path

@@ -9,16 +9,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 import { Button } from "~/components/ui/button"
 import { Avatar, AvatarFallback } from "~/components/ui/avatar"
 import { UserService } from "~/lib/api/userService";
-import type { CurrentUser } from "~/lib/api/types";
+import { type Movie, type CurrentUser } from "~/lib/api/types";
 import { useLoginState } from "~/store/login";
 import { AuthService } from "~/lib/api/authService";
 import { MovieCarousel } from "~/components/movie-carousel";
+import { RecommenderService } from "~/lib/api/recommenderService";
 
 export default function ProfilePage() {
   const router = useRouter()
-  const { isLoggedIn, setLoggedIn } = useLoginState();
+  const { isLoggedIn, setLoggedIn, setUserId } = useLoginState();
   const [activeTab, setActiveTab] = useState("ratings")
   const [user, setUser] = useState<CurrentUser | null>(null)
+  const [recs, setRecs] = useState<Movie[] | null>(null);
   useEffect(() => {
     if (!isLoggedIn) {
       router.push("/");
@@ -27,9 +29,19 @@ export default function ProfilePage() {
     async function fetchUser() {
       const currentUser = await UserService.getCurrentUser();
       setUser(currentUser);
+      setUserId(currentUser.id);
     }
     fetchUser();
-  }, [isLoggedIn, router, setUser]);
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    async function getRecs() {
+      if (!user) return;
+      const recs = await RecommenderService.get(user.id, undefined);
+      setRecs(recs);
+    }
+    getRecs();
+  }, [user]);
 
   if (!user) {
     return <div>Loading...</div>;
@@ -84,7 +96,11 @@ export default function ProfilePage() {
 
         <TabsContent value="recommendations">
           {user.ratings.length > 0 ? (
-            <MovieCarousel title="Your Recommendations" movies={user.recommendations} />
+            <MovieCarousel
+              title="Your Recommendations"
+              description="Movies that other users similar to you liked"
+              movies={recs ?? []}
+            />
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground">You don't have any recommendations.</p>

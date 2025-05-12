@@ -48,7 +48,6 @@ export const createApiClient = (config: ApiClientConfig = {}) => {
     if (response.status === 401) {
       await config.onUnauthorized?.();
       console.log("unauthorized")
-      throw new ApiError('Session expired', 401);
     }
 
     if (!response.ok) {
@@ -96,8 +95,9 @@ export const ApiClient = createApiClient({
   getToken: getAuthToken,
   onUnauthorized: async () => {
     await AuthService.logout();
-    const { setLoggedIn, setUserName } = useLoginState.getState();
+    const { setLoggedIn, setUserName, setUserId } = useLoginState();
     setLoggedIn(false);
     setUserName(null);
+    setUserId(null);
   },
 });

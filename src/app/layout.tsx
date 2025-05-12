@@ -33,7 +33,7 @@ export default function RootLayout({
           <SidebarProvider>
             <Sidebar/>
             <div className="flex flex-col flex-1 min-w-0">
-              <Header className="flex items-center" />
+              <Header/>
               <main className="flex-1 mt-16 p-4 overflow-y-auto">
                 {children}
               </main>
